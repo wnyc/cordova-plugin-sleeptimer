@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="org.nypr.cordova.sleeptimerplugin"
+    version="0.1.0">
+    <name>SleepTimer</name>
+    <description>Sleep Timer Plugin</description>
+    <license>Apache 2.0</license>
+    <keywords>sleep,timer</keywords>
+    <repo>git@git.wnyc.net:mobile/cordova/cordova-plugin-sleeptimer.git</repo>
+
+    <js-module src="www/sleeptimer.js" name="SleepTimer">
+      <clobbers target="sleeptimer"/>
+    </js-module>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="SleepTimerPlugin" >
+                <param name="android-package" value="org.nypr.cordova.sleeptimerplugin.SleepTimerPlugin"/>
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <receiver android:name="org.nypr.cordova.sleeptimerplugin.SleepTimerReceiver" />
+        </config-file>
+
+        <source-file src="src/android/SleepTimerPlugin.java" target-dir="src/org/nypr/cordova/sleeptimerplugin/" />
+        <source-file src="src/android/SleepTimerReceiver.java" target-dir="src/org/nypr/cordova/sleeptimerplugin/" />
+    </platform>
+
+    <!-- ios -->
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="SleepTimerPlugin">
+                <param name="ios-package" value="SleepTimerPlugin"/>
+            </feature>
+        </config-file>
+
+        <header-file src="src/ios/SleepTimerPlugin.h" />
+        <source-file src="src/ios/SleepTimerPlugin.m" />
+    </platform>
+</plugin>
