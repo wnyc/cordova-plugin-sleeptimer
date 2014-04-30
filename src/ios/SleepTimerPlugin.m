@@ -38,7 +38,6 @@
                                                 userInfo: nil
                                                  repeats: NO];
 
-        _countdown = true;
         if (_countdown) {
             _remainingTimeTimer = [NSTimer scheduledTimerWithTimeInterval: 1
                                                       target: self

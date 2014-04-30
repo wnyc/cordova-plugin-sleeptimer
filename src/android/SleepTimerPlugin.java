@@ -42,7 +42,6 @@ public class SleepTimerPlugin extends CordovaPlugin {
 				if (options.has("countdown")) {
 					_countdown=options.getBoolean("countdown");
 				}
-				_countdown=true;
 				
 				Intent intent = new Intent(cordova.getActivity().getApplicationContext(), SleepTimerReceiver.class);
 				
