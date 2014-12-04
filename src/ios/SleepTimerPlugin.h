@@ -9,12 +9,6 @@
 #import <Cordova/CDVPluginResult.h>
 
 @interface SleepTimerPlugin : CDVPlugin
-{
-    BOOL _countdown;
-    NSTimer * _timer;
-    NSTimer * _remainingTimeTimer;
-    NSString* _callbackId;
-}
 
 - (void)sleep:(CDVInvokedUrlCommand*)command;
 

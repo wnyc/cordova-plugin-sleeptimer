@@ -7,6 +7,23 @@
 
 #import "SleepTimerPlugin.h"
 
+static NSString * const kSleepTimerPluginJSONTypeKey = @"type";
+static NSString * const kSleepTimerPluginJSONSleepKey = @"sleep";
+static NSString * const kSleepTimerPluginJSONCountdownKey = @"countdown";
+static NSString * const kSleepTimerPluginJSONTimeLeftKey = @"timeLeft";
+
+static NSString * const kSleepTimerPluginJSONSleepValue = @"sleep";
+static NSString * const kSleepTimerPluginJSONCountdownValue = @"countdown";
+
+@interface SleepTimerPlugin ()
+
+@property BOOL countdown;
+@property NSTimer * timer;
+@property NSTimer * remainingTimeTimer;
+@property NSString * callbackId;
+
+@end
+
 @implementation SleepTimerPlugin
 
 #pragma mark Plugin methods
@@ -16,30 +33,30 @@
     CDVPluginResult* pluginResult = nil;
     NSDictionary  * options = [command.arguments objectAtIndex:0];
     
-    int seconds = [[options valueForKey:@"sleep"] integerValue];
-    _countdown = [[options valueForKey:@"countdown"] boolValue];
-    _callbackId = command.callbackId;
+    long seconds = [[options valueForKey:kSleepTimerPluginJSONSleepKey] integerValue];
+    self.countdown = [[options valueForKey:kSleepTimerPluginJSONCountdownKey] boolValue];
+    self.callbackId = command.callbackId;
     
-    if ([_timer isValid]) {
-        [_timer invalidate];
-        _timer=nil;
+    if ([self.timer isValid]) {
+        [self.timer invalidate];
+        self.timer=nil;
     }
     
-    if (_remainingTimeTimer && [_remainingTimeTimer isValid]) {
-        [_remainingTimeTimer invalidate];
-        _remainingTimeTimer=nil;
+    if (self.remainingTimeTimer && [self.remainingTimeTimer isValid]) {
+        [self.remainingTimeTimer invalidate];
+        self.remainingTimeTimer=nil;
     }
     
     if (seconds > 0){
         NSLog (@"SleepTimer Plugin sleeping..." );
-        _timer = [NSTimer scheduledTimerWithTimeInterval: seconds
+        self.timer = [NSTimer scheduledTimerWithTimeInterval: seconds
                                                   target: self
                                                 selector: @selector(sleepTimerExpired)
                                                 userInfo: nil
                                                  repeats: NO];
 
-        if (_countdown) {
-            _remainingTimeTimer = [NSTimer scheduledTimerWithTimeInterval: 1
+        if (self.countdown) {
+            self.remainingTimeTimer = [NSTimer scheduledTimerWithTimeInterval: 1
                                                       target: self
                                                     selector: @selector(sleepTimerCountdown)
                                                     userInfo: nil
@@ -53,28 +70,28 @@
 }
 
 -(void) sleepTimerExpired {
-    CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"type": @"sleep"}];
+    CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{kSleepTimerPluginJSONTypeKey : kSleepTimerPluginJSONSleepValue}];
     
-    if ([_timer isValid]) {
-        [_timer invalidate];
+    if ([self.timer isValid]) {
+        [self.timer invalidate];
     }
-    _timer=nil;
-    if (_remainingTimeTimer && [_remainingTimeTimer isValid]) {
-        [_remainingTimeTimer invalidate];
+    self.timer=nil;
+    if (self.remainingTimeTimer && [self.remainingTimeTimer isValid]) {
+        [self.remainingTimeTimer invalidate];
     }
-    _remainingTimeTimer=nil;
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:_callbackId];
+    self.remainingTimeTimer=nil;
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
 }
 
 -(void) sleepTimerCountdown {
     NSTimeInterval result = 0;
-	if (_timer && [_timer isValid]) {
-		result = [[_timer fireDate] timeIntervalSinceNow];
+	if (self.timer && [self.timer isValid]) {
+		result = [[self.timer fireDate] timeIntervalSinceNow];
 	}
  
-    CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"type": @"countdown", @"timeLeft" : @((int)ceil(result))}];
+    CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{kSleepTimerPluginJSONTypeKey: kSleepTimerPluginJSONCountdownValue, kSleepTimerPluginJSONTimeLeftKey : @((int)ceil(result))}];
     [pluginResult setKeepCallbackAsBool:YES];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:_callbackId];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
 }
 
 @end
